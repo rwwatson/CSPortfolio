@@ -1,0 +1,521 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="calendarCSS.css" />
+    <title>Calendar</title>
+</head>
+<body>
+  <div class="title">
+    CALENDAR APP
+  </div>
+  <br>
+  <div id = "homePage">
+    <span id = "returning">Returning Users:</span>
+    <br>
+    <label for="usernameinput">Enter Username: </label>
+    <input type="text" name="username" id="usernameinput" />
+    <br>
+    <label for="passwordinput">Passwor 0d: </label>
+    <input type="text" name="password" id="passwordinput"/>
+    <p>
+    <button class="login" id="loginid">Login</button>
+    </p>
+    <span id = "createAccount">Create an Account:</span>
+    <br>
+    <label for="newuserinput">New Username: </label>
+    <input type="text" name="newusername" id="newuserinput"/>
+    <br>
+    <label for="newpasswordinput">New Password: </label>
+    <input type="text" name="newpassword" id="newpasswordinput"/>
+    <br>
+    <button class="newuser" id="newuserid">Create New User</button>
+    <br><br>
+  </div>
+  <div id = "logIn">
+    <button class="logout" id="logout">Logout</button>
+    <span id = "createEvent">Create Event:</span>
+    <br>
+      <div id="newevent">
+        <label for="neweventtitle">Title: </label>
+        <input type="text" name="title" id="neweventtitle"/>
+        <br>
+        <label for="neweventtime">Time: </label>
+        <input type="text" name="title" id="neweventtime"/>
+        <br>
+        <label for="neweventday">Date: </label>
+        <input type="text" name="description" id="neweventday"/>
+        <br>
+          <div id = "radiotag">
+            <input type="radio" name="tag" value="Home" id="home">Home
+            <input type="radio" name="tag" value="Work" id="work">Work
+            <input type="radio" name="tag" value="Important" id="important">Important
+            <input type="radio" name="tag" value="Leisure" id="leisure">Leisure
+          </div>
+        <br>
+        <button class="newevent" id="neweventid">Create New Event</button>
+      </div>
+  <br><br>
+      <div id = "modifyEventBlock">
+        <span id = "modEvent">Modify Event: </span>
+        <strong id = "eventToBeModified"></strong> <br>
+        <label for="modeventtitle">Title: </label>
+        <input type="text" name="title" id="modeventtitle"/>
+        <br>
+        <label for="modeventtime">Time: </label>
+        <input type="text" name="title" id="modeventtime"/>
+        <br>
+        <label for="modeventday">Date: </label>
+        <input type="text" name="description" id="modeventday"/>
+        <br>
+        <button class="modevent" id="modeventsubmit">Modify Event</button>
+      </div>
+      <div class="headerButtons&currentDate">
+        <span id ="showEvents" >Show Events For:</span>
+        <div id = "tagshow">
+          <input type="radio" name="tagShow" value="home" id="showHome">Home
+          <input type="radio" name="tagShow" value="work" id="showWork">Work
+          <input type="radio" name="tagShow" value="important" id="showImportant">Important
+          <input type="radio" name="tagShow" value="leisure" id="showLeisure">Leisure
+          <input type="radio" name="tagShow" value="AllTags" id="showAll">Show All
+        </div>
+        <button type="button" name="deleteAll" id="deleteAll">Delete All Events</button>
+      </div>
+    </div>
+  <br><br><br>
+    <button type="button" name="button" id = "backwardsButton">Previous Month</button>
+    <span id="currentMonth"></span>
+    <span id="currentYear"></span>
+    <button type="button" name="button" id = "forwardsButton">Next Month</button>
+    <table>
+      <tr>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+      <tr>
+        <td id="1"><ul id = "event1"> </ul> </td>
+        <td id="2"><ul id = "event2"> </ul></td>
+        <td id="3"><ul id = "event3"> </ul></td>
+        <td id="4"><ul id = "event4"> </ul></td>
+        <td id="5"><ul id = "event5"> </ul></td>
+        <td id="6"><ul id = "event6"> </ul></td>
+        <td id="7"><ul id = "event7"> </ul></td>
+      </tr>
+      <tr>
+        <td id="8"><ul id = "event8"> </ul></td>
+        <td id="9"><ul id = "event9"> </ul></td>
+        <td id="10"><ul id = "event10"> </ul></td>
+        <td id="11"><ul id = "event11"> </ul></td>
+        <td id="12"><ul id = "event12"> </ul></td>
+        <td id="13"><ul id = "event13"> </ul></td>
+        <td id="14"><ul id = "event14"> </ul></td>
+      </tr>
+      <tr>
+        <td id="15"><ul id = "event15"> </ul></td>
+        <td id="16"><ul id = "event16"> </ul></td>
+        <td id="17"><ul id = "event17"> </ul></td>
+        <td id="18"><ul id = "event18"> </ul></td>
+        <td id="19"><ul id = "event19"> </ul></td>
+        <td id="20"><ul id = "event20"> </ul></td>
+        <td id="21"><ul id = "event21"> </ul></td>
+      </tr>
+      <tr>
+        <td id="22"><ul id = "event22"> </ul></td>
+        <td id="23"><ul id = "event23"> </ul></td>
+        <td id="24"><ul id = "event24"> </ul></td>
+        <td id="25"><ul id = "event25"> </ul></td>
+        <td id="26"><ul id = "event26"> </ul></td>
+        <td id="27"><ul id = "event27"> </ul></td>
+        <td id="28"><ul id = "event28"> </ul></td>
+      </tr>
+      <tr>
+        <td id="29"><ul id = "event29"> </ul></td>
+        <td id="30"><ul id = "event30"> </ul></td>
+        <td id="31"><ul id = "event31"> </ul></td>
+        <td id="32"><ul id = "event32"> </ul></td>
+        <td id="33"><ul id = "event33"> </ul></td>
+        <td id="34"><ul id = "event34"> </ul></td>
+        <td id="35"><ul id = "event35"> </ul></td>
+      </tr>
+      <tr id = "optionalRow">
+        <td id="36"><ul id = "event36"> </ul></td>
+        <td id="37"><ul id = "event37"> </ul></td>
+        <td id="38"><ul id = "event38"> </ul></td>
+        <td id="39"><ul id = "event39"> </ul></td>
+        <td id="40"><ul id = "event40"> </ul></td>
+        <td id="41"><ul id = "event41"> </ul></td>
+        <td id="42"><ul id = "event42"> </ul></td>
+      </tr>
+    </table>
+    <input type="hidden" name="token" id="tokenid" value="" />
+  <script>
+    //add event listeners for buttons
+    document.getElementById("loginid").addEventListener("click", checkpass, false);
+    document.getElementById('backwardsButton').addEventListener("click", prevMonth, false);
+    document.getElementById('forwardsButton').addEventListener("click", nextMonth, false);
+    document.getElementById('newuserid').addEventListener("click", addUser, false);
+    document.getElementById("neweventid").addEventListener("click", addEvent, false);
+    document.getElementById("tagshow").addEventListener('change', changeViewTag, false);
+    document.getElementById("logout").addEventListener('click', logout, false);
+    document.getElementById("deleteAll").addEventListener('click', deleteAll, false);
+
+    var tagToShow = "AllTags";
+    let token = "";
+
+    // function to remove all events associated with the user from sql database
+    function deleteAll() {
+      let phppath = 'deleteAll.php';
+      let data = {'username': username, 'token': token};
+      fetch(phppath, {method: "POST", body: JSON.stringify(data)})
+      .then(res => res.json())
+      .then(data => console.log(data.success ? "All Events Deleted!" : `Couldn't delete events:  ${data.message}`))
+      .then(data => refreshCal(data));
+      }
+
+    // function to remove all events except those associated with a specific tag
+    function changeViewTag(){
+      let array = document.getElementsByName("tagShow");
+      for (let i=0; i<array.length; i++) {
+        if(array[i].checked) {
+        tagToShow = array[i].value;
+        break;
+        }
+      }
+      refreshCal();
+      }
+
+    // function to end session and log out the user
+    function logout() {
+      let phppath = 'logout.php';
+      let data = {'fake': false};
+      username = "";
+      fetch(phppath, {method:"POST", body: JSON.stringify(data)})
+      .then(res => res.json())
+      .then(data => console.log(data.success ? "Session destroyed!" : `failed`));
+      refreshCal();
+      document.getElementById("homePage").style.display = "inherit";
+      document.getElementById("logIn").style.display = "none";
+      }
+
+    // function to see if a session exists and if so keeps user loged in
+    function checkSession() {
+      let phppath = 'session.php';
+      let data = {'fake': false};
+      let pause = 1000;
+      let successResult = "";
+      let newToken = "";
+      fetch(phppath, {method: "POST", body: JSON.stringify(data) })
+      .then(res => res.json())
+      .then(data => newToken = data.token);
+      setTimeout(function () {
+        //console.log(newToken);
+        token = newToken;
+        if (token!=null) {
+          document.getElementById("logout").style.display = "inherit";
+          document.getElementById("logIn").style.display = "inherit";
+          document.getElementById("homePage").style.display = "none";
+          let phppath = 'verifyuser.php';
+          let data = {'fake': false};
+          let user = "";
+          let pause = 1000;
+          fetch(phppath, {method: "POST", body: JSON.stringify(data) })
+          .then(res => res.json())
+          .then(data => user = data.username);
+          setTimeout(function () {
+                console.log(user);
+                username = user;
+                refreshCal();
+                console.log("finding the session");
+                }, pause);
+            }
+                }, pause);
+          }
+
+
+        //list all variables
+        var currentDate = new Date;
+        //get the month and day currently (used for initializing calendar)
+        var currentMonth = currentDate.getMonth() + 1;
+        var currentYear = currentDate.getFullYear();
+        //create vars for year and month to be used when incrmenting etc.
+        var year = currentYear;
+        var month = currentMonth;
+        var firstDayInt = 0;
+        let username = document.getElementById("usernameinput").value;;
+        //dictionary to convery day as string to int value so calendar starts at correct day
+         var dayStringToInt = {
+           Sun: '1',
+           Mon: '2',
+           Tue: '3',
+           Wed: '4',
+           Thu: '5',
+           Fri: '6',
+           Sat: '7'
+      };
+      //dictionary to convert month integer to month string
+      var monthIntToString = {
+        1: "January",
+        2: "February",
+        3: "March",
+        4: "April",
+        5: "May",
+        6: "June",
+        7: "July",
+        8: "Augest",
+        9: "September",
+        10: "October",
+        11: "November",
+        12: "December"
+      }
+          //function to check for succesfull login
+          function checkpass () {
+             username = document.getElementById("usernameinput").value;
+            let password = document.getElementById("passwordinput").value;
+            let phppath = 'login.php';
+            let pause = 1000;
+            let data = {'username': username, 'password':password};
+            let successResult = "";
+            fetch(phppath, {method: "POST", body: JSON.stringify(data) })
+            .then(res => res.json())
+            .then(data => successResult = data.token);
+      
+            setTimeout(function() {
+              token = successResult;
+              if (token != null) {
+              document.getElementById("homePage").style.display = "none";
+              document.getElementById("logout").style.display = "inherit";
+              document.getElementById("logIn").style.display = "inherit";
+              }
+              refreshCal();
+            }, pause);
+          }
+
+          //function for adding a new user
+          function addUser() {
+            let username = document.getElementById("newuserinput").value;
+            let password = document.getElementById("newpasswordinput").value;
+            let phppath = 'newuser.php'
+            let data = {'username': username, 'password':password};
+            fetch(phppath, {method: "POST", body: JSON.stringify(data)})
+            .then(res => res.json())
+            .then(data => console.log(data.success ? "New User Added!" : `Couldn't add new user:  ${data.message}`));
+          }
+
+          //function for creating new event
+          function addEvent() {
+            if (username != "") {
+              let title = document.getElementById("neweventtitle").value;
+              let time = document.getElementById("neweventtime").value;
+              let day = document.getElementById("neweventday").value;
+              let tag = null;
+              let phppath = 'newevent.php'
+              let array = document.getElementsByName("tag");
+              for (let i=0; i<array.length; i++) {
+                if(array[i].checked) {
+                  tag = array[i].id;
+                  array[i].checked = false;
+                  break;
+                }
+                else {
+                  tag = "";
+                }
+              }
+              document.getElementById("neweventtitle").value = "";
+              document.getElementById("neweventtime").value = "";
+              document.getElementById("neweventday").value = "";
+              let data = {'username': username,'title': title, 'time': time, 'month': month, 'day': day, 'year': year, 'token': token, 'tag': tag};
+              fetch(phppath, {method: "POST", body: JSON.stringify(data)})
+              .then(res => res.json())
+              .then(data => console.log(data.success ? "New event Added!" : `Couldn't add new event:  ${data.message}`))
+              .then(data => refreshCal(data));
+              }
+            }
+
+        // clears and repopulates the calendar with updated data
+        function refreshCal() {
+          clearCalendar();
+          populateCalendar(month, year);
+          getEvents(username);
+        }
+
+        // function to check if the sixth row of the table is needed and removes if it doesn't
+        function removeRowIfNeeded(){
+          let lastDayOfRow = document.getElementById('36').innerHTML;
+          if(lastDayOfRow == ""){
+            document.getElementById('optionalRow').style.visibility = "hidden";
+          } else{
+            document.getElementById('optionalRow').style.visibility = "visible";
+
+          }
+        }
+
+        //function for when user calls previous and next month
+        function prevMonth(){
+          month--;
+          if(month == 0){
+            month = 12;
+            year --;
+          }
+          refreshCal();
+        }
+        function nextMonth(){
+          month++;
+          if(month == 13){
+            month = 1;
+            year ++;
+          }
+         refreshCal();
+        }
+
+        //function to clear calendar before re-populating
+        function clearCalendar(){
+          for(var i = 0; i < 42; i++){
+            document.getElementById(i+1).innerHTML = "";
+          }
+        }
+
+        //function to pupulate calendar with correct days starting from the first day of the month
+        function populateCalendar(month, year){
+          document.getElementById('currentMonth').innerHTML = monthIntToString[month] + " ";
+          document.getElementById('currentYear').innerHTML = year;
+          //get the number of days in a month to populate calendar
+          var numDaysCurrentMonth = new Date(year, month, 0).getDate();
+          //get the first day of the month so calendar starts in correct location
+          var verboseDateFirstOfMonth = new Date(year, month-1, 1);
+          var firstDayString = verboseDateFirstOfMonth.toString();
+          var firstDaySubstring = firstDayString.substring(0, 3);
+          firstDayInt = dayStringToInt[firstDaySubstring];
+          //convert month int to string for displaying purposes
+          var monthString = monthIntToString[month];
+          //initiliaze var for starting position of month in calendar
+          var calendarPosition = firstDayInt;
+          //loop to fill the calendar with appropriate days for month of year
+          document.getElementById('36').innerHTML = "";
+          for(var i = 0; i < numDaysCurrentMonth; i++){
+            document.getElementById(calendarPosition).innerHTML = (i+1) + ": ";
+            calendarPosition++;
+          }
+          removeRowIfNeeded();
+        }
+
+          //function to get events from SQL
+          function getEvents(username) {
+            let phppath = 'printEvents.php';
+            let data = {'username': username};
+            fetch(phppath, {method: "POST", body: JSON.stringify(data) })
+            .then(res => res.json())
+            .then(response => printUserEvents(response, tagToShow));
+          }
+
+          //function to print user events from array or array
+          function printUserEvents(response, tagToShow){
+            for(let i = 0; i < response.length; i++){
+              let eventtitle = response[i][0];
+              let eventTime = response[i][1];
+              let eventMonth = response[i][2];
+              let eventDay = response[i][3];
+              let eventYear = response[i][4];
+              let eventID = response[i][5];
+              let eventTag = response[i][6];
+              let userid = response[i][7];
+
+              if((tagToShow == "work") || (tagToShow == "home") || (tagToShow == "important") || (tagToShow == "leisure")){
+                if((eventYear == year) && (eventMonth == month) && (eventTag == tagToShow)){
+                //get coordinate position for event relative to cal
+                let eventCalCoordinates = Number(eventDay) + Number(firstDayInt) - 1;
+                let node = document.createElement("LI");
+                let textNode = document.createTextNode( eventTime + " - " + eventtitle);
+                let eventListId = "event" + eventCalCoordinates;
+                let newButtonId = eventID;
+                node.appendChild(textNode);
+                document.getElementById(eventCalCoordinates).appendChild(node);
+                let btn = document.createElement("BUTTON");
+                let modifyBtn = document.createElement("BUTTON");
+                btn.setAttribute("id", newButtonId);   // Create a <button> element
+                modifyBtn.setAttribute("id", "mod"+newButtonId);   // Create a <button> element
+                btn.innerHTML = 'Delete';                   // Insert text
+                modifyBtn.innerHTML = 'Modify';                   // Insert text
+                document.getElementById(eventCalCoordinates).appendChild(btn);
+                document.getElementById(eventCalCoordinates).appendChild(modifyBtn);
+                document.getElementById(newButtonId).addEventListener("click", deleteEvent.bind(this, newButtonId), false);
+                document.getElementById("mod"+newButtonId).addEventListener("click", modifyEvent.bind(this, newButtonId, eventtitle, eventTime, eventDay), false);
+              }
+              } else if((eventYear == year) && (eventMonth == month)){
+                if (userid == 1) {
+                  let eventCalCoordinates = Number(eventDay) + Number(firstDayInt) - 1;
+                  let node = document.createElement("LI");
+                  let textNode = document.createTextNode(eventtitle);
+                  let eventListId = "event" + eventCalCoordinates;
+                  node.appendChild(textNode);
+                  document.getElementById(eventCalCoordinates).appendChild(node);
+                }
+                else {
+                let eventCalCoordinates = Number(eventDay) + Number(firstDayInt) - 1;
+                let node = document.createElement("LI");
+                let textNode = document.createTextNode( eventTime + " - " + eventtitle);
+                let eventListId = "event" + eventCalCoordinates;
+                let newButtonId = eventID;
+                node.appendChild(textNode);
+                document.getElementById(eventCalCoordinates).appendChild(node);
+                let btn = document.createElement("BUTTON");
+                let modifyBtn = document.createElement("BUTTON");
+                btn.setAttribute("id", newButtonId);   // Create a <button> element
+                modifyBtn.setAttribute("id", "mod"+newButtonId);   // Create a <button> element
+                btn.innerHTML = 'Delete';                   // Insert text
+                modifyBtn.innerHTML = 'Modify';                   // Insert text
+                document.getElementById(eventCalCoordinates).appendChild(btn);
+                document.getElementById(eventCalCoordinates).appendChild(modifyBtn);
+                document.getElementById(newButtonId).addEventListener("click", deleteEvent.bind(this, newButtonId), false);
+                document.getElementById("mod"+newButtonId).addEventListener("click", modifyEvent.bind(this, newButtonId, eventtitle, eventTime, eventDay), false);
+                }
+              }
+            }
+          }
+
+          // removes the associated event from the sql database
+          function deleteEvent(buttonId) {
+              let phppath = 'deleteevent.php';
+              let data = {'eventid': buttonId, 'token': token};
+              fetch(phppath, {method: "POST", body: JSON.stringify(data)})
+              .then(res => res.json())
+              .then(data => console.log(data.success ? "Event Deleted!" : `Couldn't delete event:  ${data.message}`))
+              .then(data => refreshCal(data));
+          }
+
+          // pulls the new values for the modified event
+          function modifyEvent(newButtonId, eventtitle, eventTime, eventDay){
+            document.getElementById("modifyEventBlock").style.display = "inherit";
+            document.getElementById("modeventtitle").value = eventtitle;
+            document.getElementById("modeventtime").value = eventTime;
+            document.getElementById("modeventday").value = eventDay;
+            document.getElementById("modeventsubmit").addEventListener("click", modifySubmit.bind(this, newButtonId), false);
+          }
+
+          // submits the data through php and updates the sql events
+          function modifySubmit(ButtonId) {
+            let newtitle = document.getElementById("modeventtitle").value;
+            let newtime = document.getElementById("modeventtime").value;
+            let newday = document.getElementById("modeventday").value;
+            let buttonid = ButtonId;
+            let phppath = 'modifyevent.php';
+            let data = {'newtitle': newtitle, 'newtime': newtime, 'newday': newday, 'eventid': buttonid, 'token': token};
+            fetch(phppath, {method:"POST", body: JSON.stringify(data)})
+            .then(res => res.json())
+            .then(data => console.log(data.success ? "Event modified!" : `Couldn't modify event:  ${data.message}`))
+            .then(data => refreshCal(data));
+            document.getElementById("modifyEventBlock").style.display = "none";
+          }
+
+          //populate calendar with current month for initializations
+            document.getElementById("modifyEventBlock").style.display = "none";
+            document.getElementById("logout").style.display = "none";
+            document.getElementById("logIn").style.display = "none";
+            checkSession();
+            refreshCal();
+      </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "reidw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello.js",
+  "dependencies": {
+    "mime": "^2.4.4",
+    "mssql": "^6.0.0",
+    "mysql": "^2.17.1",
+    "password-hash-and-salt": "^0.1.4",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

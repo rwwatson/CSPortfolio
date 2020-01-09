@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>Chat Room</title>
+      <style>
+         body {
+            background-color: pink;
+            font-size: 14pt;
+            font-family: "monospace";
+         }
+
+      </style>
+      <meta charset="UTF-8">
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+
+      let username = "";
+      let liverooms = new Array();
+      let currentroom = "";
+      let oldroom = "";
+      let whisperend = "";
+      var socketio = io.connect();
+
+
+      //***CLIENT MESSAGES***//
+
+      // prints messages in a given room
+      socketio.on("message_to_client1",function(data) {
+         //Append an HR thematic break and the escaped HTML of the new message
+         //console.log(data['message']);
+         //console.log(data['user']);
+         //console.log("client message recieved..");
+         if (data['message'] != undefined) {
+         document.getElementById("room_messages").appendChild(document.createElement("br"));
+         document.getElementById("room_messages").appendChild(document.createTextNode(data['message'] + " - " + data['user']));
+         }
+      });
+
+      // prints live users with whisper button, and kick and ban buttons for admin
+      socketio.on("message_to_client2", function(data) {
+         document.getElementById("roomtitle").innerHTML = "";
+         document.getElementById("roomtitle").innerHTML = data['name'];
+        //console.log("INSIDE PRINT LIVE USERS!");
+        //console.log(username + " / " + data['creator']);
+        if(data['liveusers'] != undefined){
+          let array = data['liveusers'];
+          //console.log(data['liveusers']);
+          //console.log(array);
+          document.getElementById("userlog").innerHTML = "Live Users: ";
+          for (i=0; i < array.length; ++i) {
+             var recipient = "";
+            //console.log("inside array to print live users..");
+             document.getElementById("userlog").appendChild(document.createElement("br"));
+             document.getElementById("userlog").appendChild(document.createTextNode(array[i] + "  "));
+             if(array[i] != username) {
+               var whisper = document.getElementById("userlog").appendChild(document.createElement("button"));
+               recipient = array[i]
+               var reciever = "whisper" + array[i];
+               whisper.innerHTML = "Whisper";
+               whisper.setAttribute("id", reciever);
+               document.getElementById(reciever).addEventListener("click", openWhisper.bind(this, recipient), false)
+             }
+             if (username == data['creator'] && array[i] != username) {
+                document.get
+                document.getElementById("userlog").appendChild(document.createTextNode("  "));
+                var kick = document.getElementById("userlog").appendChild(document.createElement("button"));
+                kick.innerHTML = "Kick";
+                kick.setAttribute("id", array[i]);
+                let user_to_kick = array[i];
+                document.getElementById(array[i]).addEventListener("click", function(){
+                  socketio.emit("message_to_server13", {roomid: currentroom, username: user_to_kick});
+                }, false);
+                document.getElementById("userlog").appendChild(document.createTextNode("  "));
+                var ban = document.getElementById("userlog").appendChild(document.createElement("button"));
+                ban.innerHTML = "Ban";
+             }
+          }
+        }
+      });
+
+      //case where user has succesfully logged in, hide login credentials and show username
+      socketio.on("message_to_client5", function(data) {
+        //console.log("user signed in..");
+         let bool = data.username;
+         //console.log(bool);
+         if (bool == username) {
+            document.getElementById("chatlog").style.display = "inherit";
+            document.getElementById("login").style.display = "none";
+            document.getElementById("chatrooms").style.display = "inherit";
+            document.getElementById("roomtitle").innerHTML = "Global "
+            //console.log("C5");
+            currentroom = 1;
+            //console.log("HERE");
+            changeRoom(currentroom);
+         }
+      })
+
+      //message from server to display new rooms as buttons
+      socketio.on("message_to_client6", function(data) {
+        //console.log("CLIENT 6..");
+         //console.log("the data: " + data);
+         let clientarray = new Array();
+         for (i=0; i<data.length; ++i) {
+            let bool = true;
+            for (j=0; j<liverooms.length; j++) {
+               if (liverooms[j] == data[i][0]) {
+                  bool = false;
+               }
+            }
+            if (bool) {
+               clientarray.push(data[i]);
+               liverooms.push(data[i][0]);
+            }
+
+         }
+         for (i=0; i<clientarray.length; i++) {
+            var name = clientarray[i][0];
+            var roomid = clientarray[i][1];
+            var creatorid = clientarray[i][2];
+            var password = clientarray[i][3];
+            if (password != "" && password != null) {
+               //console.log(name + " is making it into the if")
+               var btn = document.getElementById("chatrooms").appendChild(document.createElement("button"));
+               btn.setAttribute("id", roomid);
+               document.getElementById("chatrooms").appendChild(document.createTextNode("   Password Required: "))
+               var txt = document.getElementById("chatrooms").appendChild(document.createElement("INPUT"))
+               document.getElementById("chatrooms").appendChild(document.createElement("br"));
+               txt.setAttribute("type", "text");
+               txt.setAttribute("id", "password" + roomid)
+               btn.innerHTML = name;
+               btn.setAttribute("creatorid", creatorid);
+               btn.setAttribute("password", password);
+               document.getElementById(roomid).addEventListener("click", changeRoom.bind(this, roomid, password), false)
+            }
+            else {
+               //console.log("button being created");
+               var btn = document.getElementById("chatrooms").appendChild(document.createElement("button"));
+               document.getElementById("chatrooms").appendChild(document.createElement("br"));
+               btn.setAttribute("id", roomid);
+               btn.innerHTML = name;
+               btn.setAttribute("creatorid", creatorid);
+               btn.setAttribute("password", password);
+               document.getElementById(roomid).addEventListener("click", changeRoom.bind(this, roomid, password), false); // alter this
+            }
+         }
+         //console.log(clientarray);
+      })
+
+      //case where username is already taken, print error message
+      socketio.on("message_to_client7", function(data) {
+		   alert(data.message);
+         document.getElementById('newuserinput').value = "";
+         document.getElementById('newpasswordinput').value = "";
+      })
+
+      //case where chatroom name is already taken
+      socketio.on("message_to_client8", function(data) {
+    		alert("Chatroom name already in use. Try again.");
+         document.getElementById('roomname').value = "";
+      })
+
+          //reset message board to make room for new messages
+      socketio.on("message_to_client10", function(data) {
+         document.getElementById('room_messages').innerHTML = "";
+      })
+
+      //IM NOT SURE WHAT THIS DOES
+      socketio.on("message_to_client11", function(data) {
+         document.getElementById('room_messages').innerHTML = "WE GOT 2 ROOMS BITCH";
+      })
+
+      //clear the user log before repopulating
+      socketio.on("message_to_client12", function() {
+         //console.log("INSIDE CLIENT CLEAR FUNC>.");
+         document.getElementById('userlog').innerHTML = "";
+      });
+
+      //message to check which users should be kicked
+      socketio.on("message_to_client13", function(data) {
+         //console.log("INSIDE KICK FUNC");
+         //console.log(data["username"]);
+         //console.log(data["roomid"]);
+         //check if user is correct user to kick
+         if(username == data["username"]){
+            changeRoom(1);
+         }
+      });
+
+      socketio.on("message_to_client14", function(data) {
+         if (username == data.recipient && data['body'] != "") {
+            document.getElementById("room_messages").appendChild(document.createElement("br"));
+            document.getElementById("room_messages").appendChild(document.createTextNode("Whisper from " + data['sender'] + ": " + data['body']));
+         }
+         if (username == data.sender  && data['body'] != "") {
+            document.getElementById("room_messages").appendChild(document.createElement("br"));
+            document.getElementById("room_messages").appendChild(document.createTextNode("You whispered to " + data['recipient'] + ": " + data['body']));
+         }
+      })
+
+      //message from server to display all messages
+
+      //***FUNCTIONS***//
+
+      function changeRoom(roomid, password) {
+        console.log("Chnaging rooms..");
+        let oldroom = currentroom;
+        currentroom = roomid;
+        console.log("joining: "+currentroom+" currentroom"+ "--> leaving: " + oldroom);
+        socketio.emit("message_to_server8", {username: username, roomid: roomid, old_roomid: oldroom});
+        socketio.emit("message_to_server2", {username: username, roomid: roomid, old_roomid: oldroom});
+        socketio.emit("message_to_server2", {username: username, roomid: oldroom, old_roomid: oldroom});
+      }
+
+
+      function sendMessage(){
+         var msg = document.getElementById("message_input").value;
+         //console.log("in message func.. :" + msg);
+         //console.log("current user: " + username);
+         if (msg != null) {
+            console.log("its not null, sending message..");
+            socketio.emit("message_to_server1", {message:msg, usrnm: username, roomid: currentroom});
+         }
+      }
+
+      function openWhisper(recipient) {
+         document.getElementById("whisper").style.display = "inherit";
+         whisperend = recipient
+         //console.log("whisper sent with info: " + recipient);
+      }
+
+      function sendWhisper() {
+         var body = document.getElementById("whisperbody").value;
+         //console.log("sending: " + username + " " + whisperend + " " + body);
+         if (body != "") {
+            socketio.emit("message_to_server14", {sender: username, recipient: whisperend, body: body, roomid: currentroom});
+            document.getElementById("whisperbody").value = "";
+            document.getElementById("whisper").style.display = "none";
+         }
+      }
+
+      function newRoom(){
+         var msg = document.getElementById("message_input").value;
+         var name = document.getElementById("roomname").value;
+         var password = document.getElementById("roompassword").value;
+         //console.log("in new room func");
+         if (password != null) {
+            socketio.emit("message_to_server6", {username: username, name: name, password: password, roomid: currentroom, option: true});
+         }
+      }
+
+      function login() {
+         username = document.getElementById("usernameinput").value;
+         let password = document.getElementById("passwordinput").value;
+         socketio.emit("message_to_server5", {username: username, password: password, roomid: currentroom});
+      }
+
+      function logout() {
+         document.getElementById("chatlog").style.display = "none";
+         document.getElementById("login").style.display = "inherit";
+         changeRoom(100);
+         username = "";
+         document.getElementById("usernameinput").value = "";
+         document.getElementById("passwordinput").value = "";
+      }
+
+      function addUser() {
+            let username = document.getElementById("newuserinput").value;
+            let password = document.getElementById("newpasswordinput").value;
+            socketio.emit("message_to_server4", {usrnm: username, pswrd: password, roomid: currentroom});
+      }
+
+      </script>
+   </head>
+
+   <body>
+      <div id = "login">
+         <span id = "returning">Returning Users:</span>
+         <br>
+         <label for="usernameinput">Enter Username: </label>
+         <input type="text" name="username" id="usernameinput" />
+         <br>
+         <label for="passwordinput">Password: </label>
+         <input type="text" name="password" id="passwordinput"/>
+         <p>
+         <button class="login" id="loginid">Login</button>
+         </p>
+         <span id = "createAccount">Create an Account:</span>
+         <br>
+         <label for="newuserinput">New Username: </label>
+         <input type="text" name="newusername" id="newuserinput"/>
+         <br>
+         <label for="newpasswordinput">New Password: </label>
+         <input type="text" name="newpassword" id="newpasswordinput"/>
+         <br>
+         <button class="newuser" id="newuserid">Create New User</button>
+         <br><br>
+         <br>
+         <p>
+         </p>
+      </div>
+
+      <div id="chatlog">
+         <button id="logout" onclick="logout()"> Logout </button>
+         <br>
+         <div id="userlog">
+            Users Online:
+         </div>
+         <div id="whisper">
+            Whisper:
+            <input type="text" id="whisperbody"/>
+            <button id = "new_whisper"> Send </button>
+         </div>
+         <br>
+         <div id="newroom">
+            Create a New Chatroom:
+            <label for="roomname"> Room Name: </label>
+            <input type="text" id="roomname"/>
+            <label for="roompassword" > Password (Optional): </label>
+            <input type="text" id="roompassword"/>
+            <button id = "newroom_button" onclick="newRoom()"> Submit </button>
+         </div>
+         <br>
+         <div id="chatrooms">
+            Live Chatrooms:
+         <br>
+         </div>
+         <hr>
+         <div id="roomtitle"></div>
+            Chatlog:
+         <div id="currentroomname">
+         </div>
+         <div id="room_messages">
+         </div>
+         <input type="text" id="message_input"/>
+         <button onclick="sendMessage()">send</button>
+      </div>
+      <script>
+
+         document.getElementById("chatlog").style.display = "none";
+         document.getElementById("chatrooms").style.display = "none";
+         document.getElementById("whisper").style.display = "none";
+         document.getElementById("loginid").addEventListener("click", login, false);
+         document.getElementById('newuserid').addEventListener("click", addUser, false);
+         document.getElementById('new_whisper').addEventListener("click", sendWhisper, false);
+
+      </script>
+   </body>
+
+</html>
+

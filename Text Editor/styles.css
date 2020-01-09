@@ -1,0 +1,28 @@
+body{
+  padding-top: 20px;
+  background-color: lightblue;
+  font-family: sans-serif;
+  text-align: center;
+  padding-right: 15%;
+  padding-left: 15%;
+}
+
+.logout{
+  text-align: center;
+  margin-left: 80%;
+}
+
+#container {
+  /* To create the column layout. */
+  display: flex;
+  padding: 20px;
+
+  /* To make the container relative to its children. */
+  position: relative;
+}
+
+#container .ck.ck-editor {
+  /* To stretch the editor to max 700px
+     (just to look nice for this example but it can be any size). */
+  width: 100%;
+}

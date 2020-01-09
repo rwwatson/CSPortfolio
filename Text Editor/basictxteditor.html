@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CKEditor 5 – Document editor</title>
+    <!--<script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/decoupled-document/ckeditor.js"></script>-->
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        var socketio = io.connect();
+        let doctitles = new Array();
+        let docids = new Array();
+        let docbodies = new Array();
+        let sharedids = new Array();
+        let userid;
+        let user = "arbitrary";
+        let sharing_id;
+        let friendarray = new Array();
+        let isguest = false;
+
+        //case where user has succesfully logged in, hide login credentials and show username
+        //prints documents created by the user that logs in
+        socketio.on("message_to_client2", function(data) {
+            //console.log(data.username);
+            //console.log("HERE!");
+            //console.log(user);
+            //console.log(data.username);
+            if (user == data.username) { //this line makes sure that only the user that sent the request gets logged in
+            //console.log("user signed in..");
+            //console.log(data.docs);
+            if (data.success) {
+                userid = data.userid;
+                document.getElementById("docpage").style.display = "inherit";
+                document.getElementById("login").style.display = "none";
+                document.getElementById('logout').style.visibility = "visible";
+                for (i=0; i<data.docs.length; ++i) {
+                    let bool = true;
+                    for (j=0; j<docids.length; ++j) {
+                        if (data.docs[i][1] == docids[j]) {
+                            bool = false;
+                            //console.log("finding repeat");
+                        }
+                    }
+                    if (bool) {
+                        //console.log("adding new values to arrays");
+                        doctitles.push(data.docs[i][0]);
+                        docids.push(data.docs[i][1]);
+                        docbodies.push(data.docs[i][2]);
+                        printButtons(data.docs[i][0], data.docs[i][1]);
+                    }
+                }
+            }
+            else {
+                alert ("failed to login");
+            }
+          }
+        });
+
+        // send data to afterLogin() to open text editor, isadmin allows for only the admin to share the doc
+        socketio.on("message_to_client5", function(data) {
+            console.log(user);
+            if (user == data.username) { // only works when user is the one that sent the request
+                afterLogin(data["docid"], data["docbody"], data["isadmin"]);
+            }
+        })
+
+        // this prints all thee shared documents
+        // these do not update automatically and that's something we should look into
+        socketio.on("message_to_client8", function(data){
+            if (user == data.requester) { // only works when the user is the person that sent the server message
+                let isadmin = false;
+                for (i=0; i<data.shareddocs.length; ++i) {
+                  console.log(sharedids);
+                    let bool = true;
+                    for (j=0; j<sharedids.length; ++j) {
+                        if (data.shareddocs[i][1] == sharedids[j]) {
+                            bool = false;
+                            console.log("finding repeat");
+                        }
+                    }
+                    sharedids.push(data.shareddocs[i][1]);
+                    if (bool) {
+                        //print new shared docs
+                        let title = data.shareddocs[i][0];
+                        let id = data.shareddocs[i][1];
+                        let admin = data.shareddocs[i][3];
+                        var btn = document.getElementById("shareddocs").appendChild(document.createElement("button"));
+                        btn.setAttribute("id", "shared"+id);
+                        btn.innerHTML = title;
+                        var shar = document.getElementById("shareddocs").appendChild(document.createElement("div"));
+                        shar.setAttribute("id", "shar" + id);
+                        document.getElementById("shar" + id).appendChild(document.createTextNode(" Owner: " + admin));
+                        var linebreak = document.getElementById("shareddocs").appendChild(document.createElement("br"));
+                        linebreak.setAttribute("id", "linebreak" + id);
+                        document.getElementById("shared"+id).addEventListener("click", pullBody.bind(this, id, isadmin), false);
+                    }
+                }
+            }
+        })
+
+        // notifies user when a new document has been shared with them
+        socketio.on("message_to_client9", function(data){
+          if(user == data.recipient){
+            alert(data.sender + " has shared a new document!");
+          }
+
+        });
+
+        // deletes shared document for everyone that has permission
+        socketio.on("message_to_client10", function(data) {
+            if (user == data.requester) {
+                var todelete = document.getElementById("shared" + data.docid);
+                var alsodelete = document.getElementById("shar" + data.docid);
+                todelete.parentNode.removeChild(todelete);
+                alsodelete.parentNode.removeChild(alsodelete);
+            }
+        });
+
+        // this should print the buttons for a user's friends
+        // however everytime it reach the line 'friendarray.push(id)'
+        // the site becomes unresponsive, i have no clue why and i'm so tired
+        /*
+        socketio.on("message_to_client11", function(data) {
+            let pause = 1000;
+            if(data.requester == user) {
+                if (data.success == false) {
+                alert("This user does not exist!")
+                }
+                else {
+                    console.log(data.friends);
+                    for(i=0; i<data.friends.length; ++i) {
+                        let bool = true;
+                        let id = data.friends[i][0];
+                        let name = data.friends[i][1];
+                        for(j=0; j<friendarray.length; ++i) {
+                            if(id == friendarray[j]) {
+                                console.log("finging a match");
+                                bool = false;
+                            }
+                        }
+                        if (bool) {
+                            console.log("trying to print buttons");
+                            //friendarray.push(id);
+                            var btn = document.getElementById("friends").appendChild(document.createElement("button"));
+                            btn.setAttribute("id", "friend"+id);
+                            btn.innerHTML = name;
+                            document.getElementById("friends").appendChild(document.createElement("br"));
+                            //document.getElementById("shared"+id).addEventListener("click", pullBody.bind(this, id, isadmin), false);
+                        }
+                    }
+                    setTimeout(function() {console.log(friendarray);}, pause);
+                }
+            } 
+        })
+        */
+
+
+    </script>
+    <!--<style type="text/css">
+        #container {
+            /* To create the column layout. */
+            display: flex;
+            padding: 20px;
+
+            /* To make the container relative to its children. */
+            position: relative;
+        }
+
+        #container .ck.ck-editor {
+            /* To stretch the editor to max 700px
+               (just to look nice for this example but it can be any size). */
+            width: 100%;
+        }
+
+       </style>-->
+</head>
+<body>
+    <h1>Shared Document Editor</h1>
+    <button onclick="window.location.reload()" id="logout">Logout</button>
+    <!-- location=URL-->
+    <br><br>
+    <div id = "login">
+        <span id = "returning"><strong>Returning Users:</strong></span>
+        <br>
+        <label for="usernameinput">Username: </label>
+        <input type="text" name="username" id="usernameinput" />
+        <br>
+        <label for="passwordinput">Password: </label>
+        <input type="text" name="password" id="passwordinput"/>
+        <p>
+        <button class="login" id="loginid">Login</button>
+        </p>
+        <span id = "createAccount"><strong>Create an Account:</strong></span>
+        <br>
+        <label for="newuserinput">New Username: </label>
+        <input type="text" name="newusername" id="newuserinput"/>
+        <br>
+        <label for="newpasswordinput">New Password: </label>
+        <input type="text" name="newpassword" id="newpasswordinput"/>
+        <br>
+        <br>
+        <button class="newuser" id="newuserid">Create New User</button>
+        <br><br>
+        <button class="guest" id="guestuser">Sign in as guest</button>
+        <br>
+        <p>
+        </p>
+     </div>
+     <div id = "docpage">
+         <div id = "newdoc">
+             <strong>New Document:</strong><br>
+             <label for="newtitleinput">Title:</label>
+             <input type="text" name="newtitle" id="newtitleinput"/> <br>
+             <button class="createdoc" id="createdoc">Create</button>
+
+         </div>
+         <br>
+         <div id = "yourdocs">
+         <strong>Your Documents:</strong> <br>
+        </div>
+        <br>
+        <div id = "shareddocs">
+        <strong>Shared With You:</strong><br>
+         
+
+         </div>
+         <br>
+         <!--
+         <label for="newfriend">Add Friend:</label>
+         <input type="text" name="friend" id="newfriend"/>
+         <button class="addfriend" id="addfriend">Add</button>
+         <div id="friends">
+        </div>-->
+     </div>
+
+     <div id="home">
+         <div id="saving">
+       <strong>Save Document:</strong>
+     <button type="button" name="save_button" id="save">Save</button> <br>
+    </div>
+     <div id="sharing">
+       <br>
+       <strong>Share With User:</strong><br>
+     <label for="shareuser"> Username: </label>
+     <input type="text" name="sharedwith" id="shareuser"/>
+     <button type="button" name="share_button" id="share">Share</button>
+    </div>
+
+   <div id="presence-list-container"></div>
+
+  <div id="container">
+      <div id="editor"></div>
+  </div>
+
+  <div id = "docs">
+
+  </div>
+
+
+
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container"></div>
+
+    <!-- This container will become the editable. -->
+    </div>
+
+    <!--<script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>-->
+
+    <script src="../build/ckeditor.js"></script>
+
+    <script>
+
+        // hides all the html objects that appear when a user logs in
+        document.getElementById("home").style.display = "none";
+        document.getElementById("docpage").style.display = "none";
+        document.getElementById("sharing").style.display = "none";
+        document.getElementById('logout').style.visibility = "hidden";
+
+        // sets global variables
+        var doc_data
+        let temp_editor;
+        const { ClassicEditor: Editor, Watchdog } = ClassicEditor;
+        const watchdog = Watchdog.for( Editor );
+        let docid = 0;
+
+
+        // sets event listeners
+        document.getElementById("loginid").addEventListener("click", login, false);
+        document.getElementById('newuserid').addEventListener("click", addUser, false);
+        document.getElementById("createdoc").addEventListener("click", newDocument, false);
+        document.getElementById('save').addEventListener('click', save, false);
+        document.getElementById('share').addEventListener('click', share, false);
+        //document.getElementById('addfriend').addEventListener('click', addFriend, false);
+        document.getElementById('guestuser').addEventListener('click', guest, false);
+
+        //executes everything that must occur once a user's login information is validated
+        // creates editor and watchdog
+         function afterLogin(buttonid, docbody, isadmin) {
+            if (isadmin == true) { // sees is user is the creator of the doc
+                sharing_id = buttonid;
+                document.getElementById("sharing").style.display = "inherit";
+
+            }
+            else {
+                document.getElementById("sharing").style.display = "none";
+            }
+            //remove old doc editor
+            var elements = document.getElementsByClassName('ck ck-reset ck-editor ck-rounded-corners');
+                while(elements.length > 0){
+                  elements[0].parentNode.removeChild(elements[0]);
+                }
+            document.getElementById('presence-list-container').style.display = "none";
+            document.getElementById("home").style.display = "inherit";
+            //add new doc editor
+            watchdog.setCreator( ( el, config ) => {
+            return Editor.create( el, config )
+            .then( editor => {
+            temp_editor = editor;
+            });
+            return editor;
+            });
+            watchdog.create(document.querySelector( '#editor' ), {
+           //*** on load, set initial data to the data from the DB (another ajax request)
+                initialData: docbody,
+                toolbar: [ 'bold', 'italic', 'imageUpload', '|', 'comment', 'trackChanges' ],
+                cloudServices: {
+                 // PROVIDE CORRECT VALUES HERE:
+                 tokenUrl: 'https://43914.cke-cs.com/token/dev/iLoHJgU81EAHflT07kKa5ZvL5EbXnUCndP6DURrzgrt7cT4sAkAq6ecCBhxR',
+                 uploadUrl: 'https://43914.cke-cs.com/easyimage/upload/',
+                 webSocketUrl: '43914.cke-cs.com/ws',
+                 documentId: buttonid
+                },
+                presenceList: {
+                container: document.querySelector( '#presence-list-container' )
+                }
+                });
+            }
+
+        // send data to server to add user in the sql database
+        function addUser() {
+            let username = document.getElementById("newuserinput").value;
+            let password = document.getElementById("newpasswordinput").value;
+            socketio.emit("message_to_server1", {username: username, password: password});
+        }
+
+        // sends login credentials to be validated server side
+        function login() {
+            user = document.getElementById("usernameinput").value;
+            let password = document.getElementById("passwordinput").value;
+            socketio.emit("message_to_server2", {username: user, password: password});
+        }
+
+        // sends information to server to create a new document
+        function newDocument() {
+            if (isguest) {
+                let title = document.getElementById("newtitleinput").value;
+                newGuestDoc(title);
+            }
+            else {
+                let title = document.getElementById("newtitleinput").value;
+                socketio.emit("message_to_server4", {userid: userid, title: title, username: user});
+            }
+        }
+
+        // prints a given user's personal documents
+        function printButtons(title, id) {
+            let isadmin = true;
+            var btn = document.getElementById("yourdocs").appendChild(document.createElement("button"));
+            btn.setAttribute("id", "button"+id);
+            btn.innerHTML = title;
+            var dlt = document.getElementById("yourdocs").appendChild(document.createElement("button"));
+            dlt.setAttribute("id", "delete" + id);
+            dlt.innerHTML = "Delete";
+            var linebreak = document.getElementById("yourdocs").appendChild(document.createElement("br"));
+            linebreak.setAttribute("id", "linebreak" + id);
+            document.getElementById("button"+id).addEventListener("click", pullBody.bind(this, id, isadmin), false);
+            document.getElementById("delete"+id).addEventListener("click", deleteDoc.bind(this, id), false);
+        }
+
+        // pulls the saved body of a document from the database
+        function pullBody(buttonid, isadmin) {
+            docid = buttonid;
+            //console.log("pull body isadmin: " + isadmin);
+            //console.log("event click on: "+ buttonid);
+            //console.log("current document id: " + docid);
+            socketio.emit("message_to_server5", {docid:docid, isadmin: isadmin, userid: userid, username: user});
+            //afterLogin("doc"+buttonid);
+        }
+
+        // replaces old document body with current body
+        function save(){
+           alert("Data Saved to DB.")
+           //*** save data to DB (ajax -> PHP -> DB)
+           //console.log("HERE DOE");
+           //console.log("DATA TO BE SAVED: => " + temp_editor.getData());
+           socketio.emit("message_to_server3", {newbody: temp_editor.getData(), docid: docid});
+         }
+
+        // function to remove document from database
+        function deleteDoc (buttonid) {
+            var todelete = document.getElementById("delete" + buttonid);
+            var also = document.getElementById("button" + buttonid);
+            var andanother = document.getElementById("linebreak" + buttonid);
+            todelete.parentNode.removeChild(todelete);
+            also.parentNode.removeChild(also);
+            andanother.parentNode.removeChild(andanother);
+            socketio.emit("message_to_server6", {docid: buttonid, userid: userid});
+        }
+
+        // function to share a doc with a user
+        function share() {
+            var recipient = document.getElementById('shareuser').value;
+            console.log("inside share function values: " + sharing_id, userid, recipient);
+            socketio.emit("message_to_server9", {docid: docid, recipient: recipient, sender: userid})
+        }
+
+        // applies applicable features for a guest sign on
+        function guest() {
+            isguest = true;
+            document.getElementById("docpage").style.display = "inherit";
+            document.getElementById("login").style.display = "none";
+            document.getElementById('logout').style.visibility = "visible";
+            document.getElementById('shareddocs').style.display = "none";
+
+        }
+
+        // creates a new document foe a guest user
+        function newGuestDoc(title) {
+            var btn = document.getElementById("yourdocs").appendChild(document.createElement("button"));
+            btn.setAttribute("id", "guest" + title);
+            btn.innerHTML = title;
+            var linebreak = document.getElementById("yourdocs").appendChild(document.createElement("br"));
+            //linebreak.setAttribute("id", "linebreak" + id);
+            document.getElementById("guest"+title).addEventListener("click", guestEditor.bind(this, "guest"+title), false);
+        }
+
+        // creates text editor for a guest user
+        function guestEditor(docid) {
+            //remove old doc editor
+            var elements = document.getElementsByClassName('ck ck-reset ck-editor ck-rounded-corners');
+                while(elements.length > 0){
+                  elements[0].parentNode.removeChild(elements[0]);
+                }
+            document.getElementById('presence-list-container').style.display = "none";
+            document.getElementById("home").style.display = "inherit";
+            document.getElementById("saving").style.display = "none";
+            document.getElementById("sharing").style.display = "none";
+            //add new doc editor
+            watchdog.setCreator( ( el, config ) => {
+            return Editor.create( el, config )
+            .then( editor => {
+            temp_editor = editor;
+            });
+            return editor;
+            });
+            watchdog.create(document.querySelector( '#editor' ), {
+           //*** on load, set initial data to the data from the DB (another ajax request)
+                initialData: "",
+                toolbar: [ 'bold', 'italic', 'imageUpload', '|', 'comment', 'trackChanges' ],
+                cloudServices: {
+                 // PROVIDE CORRECT VALUES HERE:
+                 tokenUrl: 'https://43914.cke-cs.com/token/dev/iLoHJgU81EAHflT07kKa5ZvL5EbXnUCndP6DURrzgrt7cT4sAkAq6ecCBhxR',
+                 uploadUrl: 'https://43914.cke-cs.com/easyimage/upload/',
+                 webSocketUrl: '43914.cke-cs.com/ws',
+                 documentId: docid
+                },
+                presenceList: {
+                container: document.querySelector( '#presence-list-container' )
+                }
+                });
+
+        }
+
+        // this would add a Friend and does but the friend feature breaks everything else
+        /*
+        function addFriend() {
+            var friend = document.getElementById('newfriend').value;
+            console.log("inside addFriend: ", userid, friend, user);
+            socketio.emit("message_to_server11", {userid: userid, friend: friend, requester: user})
+        }*/
+
+    </script>
+</body>
+</html>
